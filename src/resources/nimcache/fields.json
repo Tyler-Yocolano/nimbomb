@@ -1,0 +1,10 @@
+{"compile":[
+["d:\\Documents\\Programming\\nim\\nimbomb\\src\\resources\\nimcache\\nimbomb_fields.c", "gcc.exe -c  -w -mno-ms-bitfields  -ID:\\nim\\lib -o d:\\Documents\\Programming\\nim\\nimbomb\\src\\resources\\nimcache\\nimbomb_fields.o d:\\Documents\\Programming\\nim\\nimbomb\\src\\resources\\nimcache\\nimbomb_fields.c"],
+["d:\\Documents\\Programming\\nim\\nimbomb\\src\\resources\\nimcache\\stdlib_system.c", "gcc.exe -c  -w -mno-ms-bitfields  -ID:\\nim\\lib -o d:\\Documents\\Programming\\nim\\nimbomb\\src\\resources\\nimcache\\stdlib_system.o d:\\Documents\\Programming\\nim\\nimbomb\\src\\resources\\nimcache\\stdlib_system.c"]
+],
+"link":[
+"d:\\Documents\\Programming\\nim\\nimbomb\\src\\resources\\nimcache\\nimbomb_fields.o",
+"d:\\Documents\\Programming\\nim\\nimbomb\\src\\resources\\nimcache\\stdlib_system.o"
+],
+"linkcmd": "gcc.exe   -o d:\\Documents\\Programming\\nim\\nimbomb\\src\\resources\\fields.exe  d:\\Documents\\Programming\\nim\\nimbomb\\src\\resources\\nimcache\\nimbomb_fields.o d:\\Documents\\Programming\\nim\\nimbomb\\src\\resources\\nimcache\\stdlib_system.o    "
+}
