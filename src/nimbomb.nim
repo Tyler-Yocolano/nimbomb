@@ -14,6 +14,15 @@ type
         statusCode*: int
         results*: seq[JsonNode]
 
+    NimbombClient* = object
+        client*: HttpClient
+        url*: Uri
+
+proc newNimbombClient(): NimbombClient =
+    result.client = newHttpClient()
+    result.client.headers = newHttpHeaders({ "Content-Type" : "application/json"})
+    result.url = initUri() / "http://www.giantbomb.com/api/"
+
 proc parseResponse(data: string): JsonResponse =
     let dataJson = parseJson(data)
     result.error = dataJson["error"].getStr()
@@ -24,16 +33,10 @@ proc parseResponse(data: string): JsonResponse =
     result.statusCode = dataJson["status_code"].getNum().int
     result.results = dataJson["results"].getElems()
 
-var client = newHttpClient()
-client.headers = newHttpHeaders({ "Content-Type" : "application/json"})
-
-var url = initUri() / "http://www.giantbomb.com/api/"
-
-var appends: seq[string] = @[]
-
-proc search(query: string, resources: seq[string] = @["game"]): Uri =
-    result = url
-    var toSearch = query.replace(" ", "%20")
+proc search*(nimbClient: NimbombClient, query: string, resources: varargs[string] = "game"): JsonResponse =
+    var qStruct = nimbClient.url
+    var appends: seq[string] = @[]
+    let toSearch = query.replace(" ", "%20")
     appends.add("search")
     appends.add("?api_key=" & key & "&format=json&query=%22" & toSearch & "%22&resources=")
     for i in 0 .. <resources.len:
@@ -41,13 +44,10 @@ proc search(query: string, resources: seq[string] = @["game"]): Uri =
         if i != <resources.len:
             appends[<appends.len].add(",")
     for path in appends:
-        result = result / path
+        qStruct = qStruct / path
+    let resp = nimbClient.client.getContent($qStruct)
+    result = parseResponse(resp)
 
-echo $search("so many spaces", @["game", "character"])
+var nimbomber = newNimbombClient()
 
-#let resp = client.getContent($search("metroid prime"))
-#let jsonResp = parseResponse(resp)
-
-#echo jsonResp.totalResults
-
-client.close()
+echo nimbomber.search("metroid", @["theme"]).totalResults
