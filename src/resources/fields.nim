@@ -16,7 +16,7 @@ let fieldList* = [
     @["game"])
 ]
 
-proc getFieldList*(res: string): seq[string] =
+proc getFields*(res: string): seq[string] =
     result = newSeq[string]()
     var filtered = filter(@fieldList) do (x:Field) -> bool : res in x.validRes
     for field in filtered:

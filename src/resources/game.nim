@@ -1,12 +1,15 @@
 import fields
+import resource
+
+#[
 
 type
-    Game = object
-        apiName: string
-        fieldList: seq[string]
+Game* = Resource
+    apiName*: string
+    fieldList*: seq[string]
 
 proc newGame*(): Game =
     result.apiName = "game"
-    result.fieldList = getFieldList("game")
+    #result.fieldList = getFieldList("game")
 
-echo newGame().fieldList
+]#
