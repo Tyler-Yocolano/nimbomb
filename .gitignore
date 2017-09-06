@@ -1,3 +1,5 @@
+*
 nimcache/
-*.exe
-giantbomb.api
+!*.nim
+!*.nims
+!*.nimble

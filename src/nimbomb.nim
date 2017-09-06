@@ -1,7 +1,7 @@
 # The main module to import when using this library.
 
 import os
-import httpclient, json, uri
+import httpclient, json, uri,tables
 import strutils
 
 include resources.resource # This is included for control over Resources.
@@ -20,7 +20,7 @@ type
                                     ## result of the request.
         results*: seq[JsonNode]     ## The results to be turned into Resources
                                     ## or Field content.
-        item*: JsonNode 
+        item*: JsonNode
 
     NimbombClient* = object
         ## Client used to communicate to the GiantBomb Wiki API.
@@ -33,7 +33,7 @@ type
         lastResponse*: JsonResponse ## The last jsonresponse from the server.
         results*: seq[Resource]     ## The results of the last response.
 
-proc jsonToRes*(response: JsonNode, rType: ResourceType): seq[Resource] =
+proc jsonToRes*(response: JsonNode, resourceType: ResourceType): seq[Resource] =
     echo("This func is doing nothing.")
     result = @[]
     result.add(newResource(rtGame))
@@ -44,24 +44,22 @@ proc jsonToRes*(response: seq[JsonNode]): seq[Resource] =
     for elem in response:
         var newRes = newResource(elem["resource_type"].getStr())
         echo("Creating a new " & newRes.apiName & " resource.")
-        for f in newRes.fieldList:
-            case f.kind
-                of fkStr:
-                    try:
-                        f.setContent(elem[f.apiName].getStr())
-                    except:
-                        echo("No field " & f.apiName & " exists")
-                of fkInt:
-                    try:
-                        f.setContent(elem[f.apiName].getNum().int)
-                    except:
-                        echo("No field " & f.apiName & " exists")
-                of fkRes:
-                    try:
-                        f.setContent(elem[f.apiName].jsonToRes(newRes.rType)[0])
-                    except:
-                        echo("No field " & f.apiName & " exists")
-            echo("Setting " & f.apiName )
+        for key, val in pairs(elem.getFields()):
+            case val.kind:
+                of JString:
+                    let cont = val.getStr()
+                    echo("Setting " & key & " to " & cont)
+                    newRes.fieldList.getField(key).setContent(cont)
+                of JInt:
+                    let cont = val.getNum().int
+                    echo("Setting " & key & " to " & $cont)
+                    newRes.fieldList.getField(key).setContent(cont)
+                of JObject:
+                    let cont = val.jsonToRes(rtGame)[0]
+                    echo("Setting " & key & " to " & $cont)
+                    newRes.fieldList.getField(key).setContent(cont)
+                else:
+                    discard
         result.add(newRes)
     echo($result.len() & " resources added to current results.")
 

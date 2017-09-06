@@ -35,7 +35,7 @@ type
                                 ## during a search.
         fieldList*: FieldList   ## The fields that will appear for the
                                 ## object.
-        rType*: ResourceType 
+        resourceType*: ResourceType 
 
     FieldList* = seq[Field]
 
@@ -71,24 +71,6 @@ proc setContent*(field: Field, content: string | int | Resource) =
         if field.kind == fkRes:
             field.resContent = content
 
-proc getStr*(field: Field): string =
-    try:
-        result = field.strContent
-    except:
-        raise newException(Exception, "Cannot access strContent")
-
-proc getInt*(field: Field): int =
-    try:
-        result = field.intContent
-    except:
-        raise newException(Exception, "Cannot access intContent")
-
-proc getRes*(field: Field): Resource =
-    try:
-        result = field.resContent
-    except:
-        raise newException(Exception, "Cannot access resContent")
-
 proc getFieldListNames(fl: FieldList): seq[string] =
     ## Returns the names of the fields within the list.
     result = @[]
@@ -115,10 +97,12 @@ let
     deathDate*      = newField("death_date", true, true)
     summary*        = newField("deck")
     desc*           = newField("description")
+    detailResName*  = newField("detail_resource_name")
     devs*           = newField("developers")
     devGames*       = newField("developed_games")
     devReleases*    = newField("developer_releases")
     distReleases*   = newField("distributor_releases")
+    dlcName*        = newField("dlc_name")
     enemies*        = newField("enemies")
     expReleaseDay*  = newField("expected_release_day")
     expReleaseMon*  = newField("expected_release_month", filterable = true)
@@ -135,6 +119,7 @@ let
     franchises*     = newField("franchises", fKind = fkRes)
     friends*        = newField("friends")
     game*           = newField("game", filterable = true, fKind = fkRes)
+    gameRating*     = newField("game_rating")
     games*          = newField("games", fkind = fkRes)
     genres*         = newField("genres")
     gender*         = newField("gender", true, true)
@@ -145,11 +130,16 @@ let
     installBase*    = newField("install_base", true, true)
     killedChars*    = newField("killed_characters")
     lastName*       = newField("last_name")
+    link*           = newField("link")
+    listResName*    = newField("list_resource_name")
     locAddress*     = newField("location_address")
     locCity*        = newField("location_city")
     locCountry*     = newField("location_country")
     locState*       = newField("location_state")
     locations*      = newField("locations", fKind = fkRes)
+    maxPlayers*     = newField("maximum_players")
+    minPlayers*     = newField("minimum_players")
+    multiFeatures*  = newField("multiplayer_features")
     name*           = newField("name", true, true)
     amtUserReviews* = newField("number_of_user_reviews")
     objects*        = newField("objects", fkind = fkRes)
@@ -162,22 +152,35 @@ let
     phone*          = newField("phone")
     platform*       = newField("platform", true, true, fkRes)
     platforms*      = newField("platforms", fKind = fkRes)
+    prodCodeType*   = newField("product_code_type")
+    prodCodeVal*    = newField("product_code_value")
     pubGames*       = newField("published_games")
     pubReleases*    = newField("published_releases")
     publishers*     = newField("publishers")
+    publishDate*    = newFIeld("publish_date")
     ratingBoard*    = newField("rating_board", true, true, fkRes)
     realName*       = newField("real_name")
+    region*         = newField("region", fKind = fkRes)
     relatedCons*    = newField("related_concepts")
     releaseDate*    = newField("release_date", sortable = true)
+    release*        = newField("release")
     releases*       = newField("releases", fKind = fkRes)
+    resolutions*    = newField("resolutions")
+    resourceType*   = newField("resource_type")
+    reviewer*       = newField("reviewer")
     dlcs*           = newField("dlcs", fKind = fkRes)
     reviews*        = newField("reviews", fKind = fkRes)
+    score*          = newField("score")
     similarGames*   = newField("similarGames")
     siteDetailUrl*  = newField("site_detail_url")
+    soundSystems*   = newField("sound_system")
+    spFeatures*     = newField("singleplayer_features")
     title*          = newField("title")
     themes*         = newField("themes", fKind = fkRes)
     website*        = newField("website")
+    user*           = newField("user")
     videos*         = newField("videos", fKind = fkRes)
+    widescreen*     = newField("widescreen_support")
 
 # Yowza..
 
@@ -185,7 +188,7 @@ proc newResource*(resType: ResourceType): Resource =
     ## Creates a new resource and fills in the field list based on its type.
     result.apiName = $resType
     result.filters = @["field_list"]
-    result.rType = resType
+    result.resourceType = resType
 
     case result.apiName:
         of "accessory", "accessories":
@@ -322,17 +325,124 @@ proc newResource*(resType: ResourceType): Resource =
                                  lastUpdated, summary, desc, id, image,
                                  installBase, name, onlineSupport, origPrice,
                                  releaseDate, siteDetailUrl)
-        
+        of "promo", "promos":
+            if result.apiName == "promos":
+                result.filters = @["field_list", "limit", "offset", "sort",
+                                   "filter"]
+            result.fieldList = newFieldList(apiDetailUrl, added, summary,
+                                            id, image, link, name,
+                                            resourceType, user)
+        of "rating_board", "rating_boards":
+            if result.apiName == "raing_boards":
+                result.filters = @["field_list", "limit", "offset", "sort",
+                                   "filter"]
+            result.fieldList = newFieldList(apiDetailUrl, added, lastUpdated,
+                                            summary, desc, id, image, name,
+                                            region, siteDetailUrl)
+        of "region":
+            result.fieldList = newFieldList(apiDetailUrl, added, lastUpdated,
+                                            summary, desc, id, image, name,
+                                            siteDetailUrl)    
+        of "regions":
+            result.filters = @["field_list", "limit", "offset", "sort",
+                                "filter"]
+            result.fieldList = newFieldList(apiDetailUrl, added, lastUpdated,
+                                            summary, desc, id, image, name,
+                                            siteDetailUrl)
+        of "release", "releases":
+            if result.apiName == "releases":
+                result.filters = @["field_list", "limit", "offset", "platforms",
+                                   "sort", "filter"]
+            result.fieldList = newFieldList(apiDetailUrl, added, lastUpdated,
+                                            summary, desc, expReleaseDay,
+                                            expReleaseMon, expReleaseQrtr,
+                                            expReleaseYear, game, gameRating,
+                                            id, image, maxPlayers, minPlayers,
+                                            multiFeatures, name, platform,
+                                            prodCodeType, prodCodeVal, region,
+                                            releaseDate, resolutions, spFeatures,
+                                            soundSystems, siteDetailUrl,
+                                            widescreen)
+        of "review":
+            result.fieldList = newFieldList(apiDetailUrl, summary, desc, dlcName,
+                                            game, platforms, publishDate, release,
+                                            reviewer, score, siteDetailUrl)
+        of "reviews":
+            result.filters = @["field_list", "limit", "offset", "sort",
+                               "filter"]
+            result.fieldList = newFieldList(apiDetailUrl, summary, desc, dlcName,
+                                            game, publishDate, release, reviewer,
+                                            score, siteDetailUrl)
+        of "search":
+            result.filters = @["field_list", "limit", "page", "query",
+                               "resources", "subscriber_only"]
+            result.fieldList = newFieldList(resourceType)
+        of "theme", "themes":
+            if result.apiName == "themes":
+                result.filters = @["field_list", "limit", "offset", "sort",
+                                   "filter"]
+            result.fieldList = newFieldList(apiDetailUrl, id, name,
+                                            siteDetailUrl)
+        of "type", "types":
+            result.filters = @[]
+            result.fieldList = newFieldList(detailResName, id, listResName)
+        of "theme, themes":
+            if result.apiName == "themes":
+                result.filters = @["field_list", "limit", "offset", "sort",
+                                   "filter"]
+            result.fieldList = newFieldList(apiDetailUrl, id, name,
+                                            siteDetailUrl)
+        of "user_review", "user_reviews":
+            if result.apiName == "user_reviews":
+                result.filters = @["field_list", "limit", "offset", "sort",
+                                   "filter", "game"]
+            result.fieldList = newFieldList(apiDetailUrl, added, lastUpdated,
+                                            summary, desc, game, reviewer,
+                                            score, siteDetailUrl)
         # TODO: Finish this.
 
 proc newResource*(resType: string): Resource =
     ## Helper for creating a resource from a string.
-    ## Will throw an error if the string doesn't match
+    ## Will create an 'Error' resource if the string doesn't match
     ## to a ResourceType.
     for t in ResourceType.items:
         if $t == resType:
             return newResource(t)
-    raise newException(Exception, "Tried to instance bad resource type: " & resType)
+    return newResource(rtError)
 
+proc getStr*(field: Field): string =
+    if field.kind != fkStr:
+        result = ""
+    else:
+        result = field.strContent
+
+proc getInt*(field: Field): int =
+    if field.kind != fkInt:
+        result = 0
+    else:
+        result = field.intContent
+
+proc getRes*(field: Field): Resource =
+    if field.kind != fkRes:
+        result = newResource(rtError)
+    else:
+        result = field.resContent
+
+proc getField*(fl: FieldList, field: FieldObject): Field =
+    result = filter(fl, proc(x: Field): bool = x.apiName == field.apiName)[0]
 proc getField*(fl: FieldList, name: string): Field =
     result = filter(fl, proc(x: Field): bool = x.apiName == name)[0]
+
+proc `$`*(resource: Resource): string =
+    try:
+        result = resource.fieldList.getField(name).strContent
+    except:
+        result = ""
+proc `$`*(field: Field): string =
+    case field.kind:
+        of fkStr:
+            result = field.strContent
+        of fkInt:
+            result = $field.intContent
+        of fkRes:
+            result = $field.resContent 

@@ -52,3 +52,4 @@ type
         rtVideoCats     = "video_categories",
         rtVideoShow     = "video_show",
         rtVideoShows    = "video_shows"
+        rtError         = "error"
