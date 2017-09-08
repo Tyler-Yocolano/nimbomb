@@ -31,35 +31,39 @@ type
                                     ## giantbomb.api
                                     ## within the app directory.
         lastResponse*: JsonResponse ## The last jsonresponse from the server.
-        results*: seq[Resource]     ## The results of the last response.
 
-proc jsonToRes*(response: JsonNode, resourceType: ResourceType): seq[Resource] =
-    echo("This func is doing nothing.")
-    result = @[]
-    result.add(newResource(rtGame))
+proc jsonToRes*(element: JsonNode, resType: string): Resource =
+    result = newResource(element[resType].getStr())
+    echo("Creating a new " & result.apiName & " resource.")
+    for key, val in pairs(element.getFields()):
+        case val.kind:
+            of JString:
+                let cont = val.getStr()
+                if(cont.len > 20):
+                    echo("Setting " & key & " to " & cont[0 .. 20])
+                else:
+                    echo("Setting " & key & " to " & cont)
+                result.fieldList.getField(key).setContent(cont)
+            of JInt:
+                let cont = val.getNum().int
+                echo("Setting " & key & " to " & $cont)
+                result.fieldList.getField(key).setContent(cont)
+            of JObject:
+                try:
+                    let cont = jsonToRes(val, key)
+                    echo("Setting " & key & " to " & $cont)
+                    result.fieldList.getField(key).setContent(cont)
+                except:
+                    result = newResource("error")
+            else:
+                discard
+
 
 proc jsonToRes*(response: seq[JsonNode]): seq[Resource] =
     echo("Creating Resource list from JsonNode list.")
     result = @[]
     for elem in response:
-        var newRes = newResource(elem["resource_type"].getStr())
-        echo("Creating a new " & newRes.apiName & " resource.")
-        for key, val in pairs(elem.getFields()):
-            case val.kind:
-                of JString:
-                    let cont = val.getStr()
-                    echo("Setting " & key & " to " & cont)
-                    newRes.fieldList.getField(key).setContent(cont)
-                of JInt:
-                    let cont = val.getNum().int
-                    echo("Setting " & key & " to " & $cont)
-                    newRes.fieldList.getField(key).setContent(cont)
-                of JObject:
-                    let cont = val.jsonToRes(rtGame)[0]
-                    echo("Setting " & key & " to " & $cont)
-                    newRes.fieldList.getField(key).setContent(cont)
-                else:
-                    discard
+        var newRes = jsonToRes(elem, "resource_type")
         result.add(newRes)
     echo($result.len() & " resources added to current results.")
 
@@ -72,7 +76,6 @@ proc newNimbombClient*(): NimbombClient =
     result.client.headers = newHttpHeaders({ "Content-Type" :
                                              "application/json"})
     result.url = initUri() / "http://www.giantbomb.com/api/"
-    result.results = @[]
 
 proc parseSearch(data: string): JsonResponse =
     echo("Parsing search...")
@@ -100,7 +103,7 @@ proc parseResponse(data: string): JsonResponse =
     echo("Parse succeeded with " & result.item["name"].getStr())
 
 proc search*(nimbClient: var NimbombClient, query: string,
-             resources: varargs[ResourceType] = rtGame) =
+             resources: varargs[ResourceType] = rtGame): seq[Resource] =
     ## Search function to find any type of resource offered in the wiki.
     echo("Searching for " & query)
     var qStruct = nimbClient.url
@@ -117,7 +120,7 @@ proc search*(nimbClient: var NimbombClient, query: string,
     echo("Requesting from " & $qStruct)
     let resp = nimbClient.client.getContent($qStruct)
     nimbClient.lastResponse = parseSearch(resp)
-    nimbClient.results = jsonToRes(nimbClient.lastResponse.results)
+    result = jsonToRes(nimbClient.lastResponse.results)
     echo("Search complete.")
 
 proc get*(nimbClient: var NimbombClient, adu: string, resourceType: ResourceType): Resource =
@@ -125,5 +128,4 @@ proc get*(nimbClient: var NimbombClient, adu: string, resourceType: ResourceType
     let qStruct = adu / ("?api_key=" & nimbClient.apiKey & "&format=json")
     let resp = nimbClient.client.getContent($qStruct)
     nimbClient.lastResponse = parseResponse(resp)
-    nimbClient.results = jsonToRes(nimbClient.lastResponse.item, resourceType)
-    result = nimbClient.results[0]
+    #nimbClient.results = jsonToRes(nimbClient.lastResponse.item)

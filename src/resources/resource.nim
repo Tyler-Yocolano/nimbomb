@@ -245,6 +245,8 @@ proc newResource*(resType: ResourceType): Resource =
             result.fieldList = newFieldList(apiDetailUrl, added, lastUpdated, summary,
                                 desc, game, id, image, name, platform,
                                 releaseDate, siteDetailUrl)
+        of "error":
+            result.fieldList = newFieldList(name)
         of "franchise":
             result.fieldList = newFieldList(aliases, apiDetailUrl, characters, concepts,
                                  added, lastUpdated, summary, desc, games,
@@ -428,21 +430,25 @@ proc getRes*(field: Field): Resource =
     else:
         result = field.resContent
 
-proc getField*(fl: FieldList, field: FieldObject): Field =
-    result = filter(fl, proc(x: Field): bool = x.apiName == field.apiName)[0]
 proc getField*(fl: FieldList, name: string): Field =
-    result = filter(fl, proc(x: Field): bool = x.apiName == name)[0]
-
-proc `$`*(resource: Resource): string =
     try:
-        result = resource.fieldList.getField(name).strContent
+        result = filter(fl, proc(x: Field): bool = x.apiName == name)[0]
     except:
-        result = ""
+        result = Field(apiName: "error", kind: fkStr)
+        result.setContent("error")
+
+proc getField*(fl: FieldList, field: FieldObject): Field =
+    result = getField(fl, field.apiName) 
+
 proc `$`*(field: Field): string =
     case field.kind:
         of fkStr:
-            result = field.strContent
+            result = field.getStr()
         of fkInt:
-            result = $field.intContent
+            result = $(field.getInt())
         of fkRes:
-            result = $field.resContent 
+            result = $(field.getRes())
+
+proc `$`*(resource: Resource): string =
+    result = resource.fieldList.getField(name).getStr()
+

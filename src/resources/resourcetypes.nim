@@ -53,3 +53,6 @@ type
         rtVideoShow     = "video_show",
         rtVideoShows    = "video_shows"
         rtError         = "error"
+    Unsupported* = enum
+        rtImage         = "image"
+        rtImages        = "images"

@@ -4,7 +4,7 @@ import json
 when isMainModule:
     block:
         var nimbomber = newNimbombClient()
-        nimbomber.search("halo", rtGame)
+        let sResults = nimbomber.search("zelda", rtGame)
         assert( nimbomber.lastResponse.error == "OK")
-        for res in nimbomber.results:
+        for res in sResults:
             echo($res)
