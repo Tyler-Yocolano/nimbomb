@@ -11,7 +11,7 @@ type
         rtCompany       = "company",
         rtCompanies     = "companies",
         rtConcept       = "concept",
-        rtConecepts     = "concepts",
+        rtConcepts      = "concepts",
         rtDLC           = "dlc",
         rtDLCS          = "dlcs",
         rtFranchise     = "franchise",
@@ -22,6 +22,8 @@ type
         rtGameRts       = "game_ratings",
         rtGenre         = "genre",
         rtGenres        = "genres",
+        rtImage         = "image",
+        rtImages        = "images",
         rtLocation      = "location",
         rtLocations     = "locations",
         rtObject        = "object",
@@ -32,6 +34,7 @@ type
         rtPlatforms     = "platforms",
         rtPromo         = "promo",
         rtPromos        = "promos",
+        rtPublisher     = "publisher",
         rtRtBoard       = "rating_board",
         rtRtBoards      = "rating_boards",
         rtRegion        = "region",
@@ -53,6 +56,3 @@ type
         rtVideoShow     = "video_show",
         rtVideoShows    = "video_shows"
         rtError         = "error"
-    Unsupported* = enum
-        rtImage         = "image"
-        rtImages        = "images"

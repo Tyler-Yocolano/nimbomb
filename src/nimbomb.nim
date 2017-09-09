@@ -34,7 +34,7 @@ type
 
 proc jsonToRes*(element: JsonNode, resType: string): Resource =
     ## Converts a json node to a resource.
-    result = newResource(element[resType].getStr())
+    result = newResource(resType)
     for key, val in pairs(element.getFields()): #Iterate through the node's k/v pairs.
         case val.kind:
             of JString:
@@ -52,7 +52,17 @@ proc jsonToRes*(element: JsonNode, resType: string): Resource =
                 except:
                     # If the field doesn't exist, return an error.
                     result = newResource("error")
-                echo(key & " set to: " & $result.fieldList.getField(key))
+                #echo(key & " set to: " & $result.fieldList.getField(key))
+            of JArray:
+                var list: seq[Resource] = @[]
+                for obj in val:
+                    try:
+                        let arrRes = result.fieldList.getField(key).arrKind
+                        let cont = jsonToRes(obj, $arrRes)
+                        list.add(cont)
+                    except:
+                        discard
+                result.fieldList.getField(key).setContent(list)
             else:
                 discard
 
