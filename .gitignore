@@ -1,5 +1,5 @@
 *
-nimcache/
+
 !*.nim
 !*.nims
 !*.nimble
