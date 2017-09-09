@@ -20,7 +20,7 @@ type
                                     ## result of the request.
         results*: seq[JsonNode]     ## The results to be turned into Resources
                                     ## or Field content.
-        item*: JsonNode
+        result*: JsonNode
 
     NimbombClient* = object
         ## Client used to communicate to the GiantBomb Wiki API.
@@ -33,39 +33,35 @@ type
         lastResponse*: JsonResponse ## The last jsonresponse from the server.
 
 proc jsonToRes*(element: JsonNode, resType: string): Resource =
+    ## Converts a json node to a resource.
     result = newResource(element[resType].getStr())
-    echo("Creating a new " & result.apiName & " resource.")
-    for key, val in pairs(element.getFields()):
+    for key, val in pairs(element.getFields()): #Iterate through the node's k/v pairs.
         case val.kind:
             of JString:
                 let cont = val.getStr()
-                if(cont.len > 20):
-                    echo("Setting " & key & " to " & cont[0 .. 20])
-                else:
-                    echo("Setting " & key & " to " & cont)
                 result.fieldList.getField(key).setContent(cont)
+                echo(key & " set to: " & $result.fieldList.getField(key))
             of JInt:
                 let cont = val.getNum().int
-                echo("Setting " & key & " to " & $cont)
                 result.fieldList.getField(key).setContent(cont)
+                echo(key & " set to: " & $result.fieldList.getField(key))
             of JObject:
                 try:
                     let cont = jsonToRes(val, key)
-                    echo("Setting " & key & " to " & $cont)
                     result.fieldList.getField(key).setContent(cont)
                 except:
+                    # If the field doesn't exist, return an error.
                     result = newResource("error")
+                echo(key & " set to: " & $result.fieldList.getField(key))
             else:
                 discard
 
 
 proc jsonToRes*(response: seq[JsonNode]): seq[Resource] =
-    echo("Creating Resource list from JsonNode list.")
     result = @[]
     for elem in response:
-        var newRes = jsonToRes(elem, "resource_type")
+        var newRes = jsonToRes(elem, elem["resource_type"].getStr())
         result.add(newRes)
-    echo($result.len() & " resources added to current results.")
 
 let api = getCurrentDir() / "giantbomb.api" # Points to the api-key file.
 
@@ -78,7 +74,6 @@ proc newNimbombClient*(): NimbombClient =
     result.url = initUri() / "http://www.giantbomb.com/api/"
 
 proc parseSearch(data: string): JsonResponse =
-    echo("Parsing search...")
     let dataJson = parseJson(data)
     result.error = dataJson["error"].getStr()
     result.limit = dataJson["limit"].getNum().int
@@ -87,11 +82,8 @@ proc parseSearch(data: string): JsonResponse =
     result.totalResults = dataJson["number_of_total_results"].getNum().int
     result.statusCode = dataJson["status_code"].getNum().int
     result.results = dataJson["results"].getElems()
-    echo("Search succeeded with " & $result.totalResults & " results.")
-    echo("Result[0]'s ADU is " & result.results[0][apiDetailUrl.apiName].getStr())
 
 proc parseResponse(data: string): JsonResponse =
-    echo("Parsing one response.")
     let dataJson = parseJson(data)
     result.error = dataJson["error"].getStr()
     result.limit = dataJson["limit"].getNum().int
@@ -99,13 +91,11 @@ proc parseResponse(data: string): JsonResponse =
     result.pgResults = dataJson["number_of_page_results"].getNum().int
     result.totalResults = dataJson["number_of_total_results"].getNum().int
     result.statusCode = dataJson["status_code"].getNum().int
-    result.item = dataJson["results"]
-    echo("Parse succeeded with " & result.item["name"].getStr())
+    result.result = dataJson["results"]
 
 proc search*(nimbClient: var NimbombClient, query: string,
              resources: varargs[ResourceType] = rtGame): seq[Resource] =
     ## Search function to find any type of resource offered in the wiki.
-    echo("Searching for " & query)
     var qStruct = nimbClient.url
     var appends: seq[string] = @[]
     let toSearch = query.replace(" ", "%20")
@@ -117,15 +107,22 @@ proc search*(nimbClient: var NimbombClient, query: string,
             appends[<appends.len].add(",")
     for path in appends:
         qStruct = qStruct / path
-    echo("Requesting from " & $qStruct)
     let resp = nimbClient.client.getContent($qStruct)
     nimbClient.lastResponse = parseSearch(resp)
     result = jsonToRes(nimbClient.lastResponse.results)
-    echo("Search complete.")
 
 proc get*(nimbClient: var NimbombClient, adu: string, resourceType: ResourceType): Resource =
-    echo("Getting object from " & adu)
     let qStruct = adu / ("?api_key=" & nimbClient.apiKey & "&format=json")
     let resp = nimbClient.client.getContent($qStruct)
     nimbClient.lastResponse = parseResponse(resp)
-    #nimbClient.results = jsonToRes(nimbClient.lastResponse.item)
+
+proc get*(nimbClient: var NimbombClient, fromSearch: Resource, filters: varargs[FieldObject]): Resource =
+    var qStruct = fromSearch.fieldList.getField(apiDetailUrl).getStr() / ("?api_key=" & nimbClient.apiKey & "&format=json&field_list=")
+    for i in 0..<filters.len:
+        qStruct = qStruct / filters[i].apiName
+        if i != <filters.len:
+            qStruct = qStruct / ","
+    echo $qStruct
+    let resp = nimbClient.client.getContent($qStruct)
+    nimbClient.lastResponse = parseResponse(resp)
+    result = nimbClient.lastResponse.result.jsonToRes($fromSearch.resourceType)

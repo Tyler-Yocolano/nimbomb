@@ -122,7 +122,7 @@ let
     gameRating*     = newField("game_rating")
     games*          = newField("games", fkind = fkRes)
     genres*         = newField("genres")
-    gender*         = newField("gender", true, true)
+    gender*         = newField("gender", true, true, fkind = fkInt)
     hometown*       = newField("hometown", true, true)
     id*             = newField("id", true, true, fkInt)
     image*          = newField("image")
@@ -137,11 +137,11 @@ let
     locCountry*     = newField("location_country")
     locState*       = newField("location_state")
     locations*      = newField("locations", fKind = fkRes)
-    maxPlayers*     = newField("maximum_players")
-    minPlayers*     = newField("minimum_players")
+    maxPlayers*     = newField("maximum_players", fkind = fkInt)
+    minPlayers*     = newField("minimum_players", fkind = fkInt)
     multiFeatures*  = newField("multiplayer_features")
-    name*           = newField("name", true, true)
-    amtUserReviews* = newField("number_of_user_reviews")
+    nameField*      = newField("name", true, true)
+    amtUserReviews* = newField("number_of_user_reviews", fkind = fkInt)
     objects*        = newField("objects", fkind = fkRes)
     origGameRating* = newField("original_game_rating")
     origRlsDate*    = newField("original_release_date")
@@ -186,6 +186,7 @@ let
 
 proc newResource*(resType: ResourceType): Resource =
     ## Creates a new resource and fills in the field list based on its type.
+    ## Can be found at https://www.giantbomb.com/api/documentation
     result.apiName = $resType
     result.filters = @["field_list"]
     result.resourceType = resType
@@ -196,13 +197,13 @@ proc newResource*(resType: ResourceType): Resource =
                 result.filters = @["field_list", "limit", "offset", "sort",
                                    "filter"]
             result.fieldList = newFieldList(apiDetailUrl, added, lastUpdated,
-                                 summary, desc, id, image, name, siteDetailUrl)
+                                 summary, desc, id, image, nameField, siteDetailUrl)
         of "character":
             result.fieldList = newFieldList(aliases, apiDetailUrl, birthday,
                                  concepts, added, lastUpdated, summary, desc,
                                  enemies, firstInGame, franchises, friends,
                                  games, gender, id, image, lastName, locations,
-                                 name, objects, people, realName,
+                                 nameField, objects, people, realName,
                                  siteDetailUrl)
         of "characters":
             result.filters = @["field_list", "limit", "offset", "sort",
@@ -210,7 +211,7 @@ proc newResource*(resType: ResourceType): Resource =
             result.fieldList = newFieldList(aliases, apiDetailUrl, birthday,
                                  added, lastUpdated, summary, desc, 
                                  firstInGame, gender, id, image, 
-                                 lastName, name, realName,
+                                 lastName, nameField, realName,
                                  siteDetailUrl)
         of "chat", "chats":
             result.fieldList = newFieldList(apiDetailUrl, channelName, summary,
@@ -224,39 +225,39 @@ proc newResource*(resType: ResourceType): Resource =
                                  lastUpdated, summary, desc, devGames,
                                  devReleases, distReleases, id, image,
                                  locAddress, locCity, locState, locCountry,
-                                 locations, name, objects, people, phone, 
+                                 locations, nameField, objects, people, phone, 
                                  pubGames, pubReleases, siteDetailUrl, website)
         of "concept":
             result.fieldList = newFieldList(aliases, apiDetailUrl, characters,
                                  concepts, added, lastUpdated, summary, desc,
                                  firstFranchise, firstInGame, franchises, 
-                                 games, id, image, locations, name, objects,
+                                 games, id, image, locations, nameField, objects,
                                  people, relatedCons, siteDetailUrl)
         of "concepts":
             result.filters = @["field_list", "limit", "offset", "sort",
                                "filter"]
             result.fieldList = newFieldList(aliases, apiDetailUrl, added, lastUpdated,
                                  summary, desc, firstFranchise, firstInGame, 
-                                 id, image, name, siteDetailUrl)
+                                 id, image, nameField, siteDetailUrl)
         of "dlc", "dlcs":
             if result.apiName == "dlcs":
                 result.filters = @["field_list", "limit", "offset", "sort",
                                    "filter"]
             result.fieldList = newFieldList(apiDetailUrl, added, lastUpdated, summary,
-                                desc, game, id, image, name, platform,
+                                desc, game, id, image, nameField, platform,
                                 releaseDate, siteDetailUrl)
         of "error":
-            result.fieldList = newFieldList(name)
+            result.fieldList = newFieldList(nameField)
         of "franchise":
             result.fieldList = newFieldList(aliases, apiDetailUrl, characters, concepts,
                                  added, lastUpdated, summary, desc, games,
-                                 id, image, locations, name, objects,
+                                 id, image, locations, nameField, objects,
                                  people, siteDetailUrl)
         of "franchises":
             result.filters = @["field_list", "limit", "offset", "sort",
                                "filter"]
             result.fieldList = newFieldList(aliases, apiDetailUrl, added, lastUpdated,
-                                 summary, desc, id, image, name, siteDetailUrl)
+                                 summary, desc, id, image, nameField, siteDetailUrl)
         of "game":
             result.fieldList = newFieldList(aliases, apiDetailUrl, characters, concepts,
                                  added, lastUpdated, summary, desc, devs,
@@ -264,7 +265,7 @@ proc newResource*(resType: ResourceType): Resource =
                                  expReleaseYear, firstChars, firstConcepts,
                                  firstLocs, firstObjects, firstPeople,
                                  franchises, genres, id, image, images,
-                                 killedChars, locations, name, amtUserReviews,
+                                 killedChars, locations, nameField, amtUserReviews,
                                  objects, origGameRating, origRlsDate, people,
                                  platforms, publishers, releases, dlcs, reviews,
                                  similarGames, siteDetailUrl, themes, videos)
@@ -273,44 +274,44 @@ proc newResource*(resType: ResourceType): Resource =
                                "sort", "filter"]
             result.fieldList = newFieldList(aliases, apiDetailUrl, added, 
                                  lastUpdated, summary, desc, expReleaseMon, 
-                                 expReleaseQrtr, expReleaseYear, image, name,
+                                 expReleaseQrtr, expReleaseYear, image, nameField,
                                  amtUserReviews,origGameRating, origRlsDate,
                                  platforms, siteDetailUrl)
         of "game_rating", "game_ratings":
             if result.apiName == "game_ratings":
                 result.filters = @["field_list", "limit", "offset", "sort",
                                    "filter"]
-            result.fieldList = newFieldList(apiDetailUrl, id, image, name, ratingBoard)
+            result.fieldList = newFieldList(apiDetailUrl, id, image, nameField, ratingBoard)
         of "genre", "genres":
             if result.apiName == "genres":
                 result.filters = @["field_list", "limit", "offset"]
             result.fieldList = newFieldList(apiDetailUrl, added, lastUpdated,
-                                 summary, desc, id, image, name,
+                                 summary, desc, id, image, nameField,
                                  siteDetailUrl)
         of "location", "locations":
             if result.apiName == "locations":
                 result.filters = @["field_list", "limit", "offset"]
             result.fieldList = newFieldList(aliases, apiDetailUrl, added, lastUpdated,
-                                 summary, desc, id, image, name,
+                                 summary, desc, id, image, nameField,
                                  siteDetailUrl)
         of "object":
             result.fieldList = newFieldList(aliases, apiDetailUrl, characters, companies,
                                  concepts, added, lastUpdated, summary, desc,
                                  firstInGame, franchises, games, id, image,
-                                 locations, name, objects, people,
+                                 locations, nameField, objects, people,
                                  siteDetailUrl)
         of "objects":
             result.filters = @["field_list", "limit", "offset", "sort",
                                "filter"]
             result.fieldList = newFieldList(aliases, apiDetailUrl, added, lastUpdated,
                                  summary, desc, firstInGame, id, image,
-                                 name, siteDetailUrl)
+                                 nameField, siteDetailUrl)
         of "person":
             result.fieldList = newFieldList(aliases, apiDetailUrl, birthday, characters,
                                  concepts, country, added, lastUpdated,
                                  deathDate, summary, desc, firstCreditIn,
                                  franchises, games, gender, hometown, id,
-                                 image, locations, name, objects, people,
+                                 image, locations, nameField, objects, people,
                                  siteDetailUrl)
         of "people":
             result.filters = @["field_list", "limit", "offset", "sort",
@@ -318,38 +319,38 @@ proc newResource*(resType: ResourceType): Resource =
             result.fieldList = newFieldList(aliases, apiDetailUrl, birthday, country,
                                  added, lastUpdated, deathDate, summary,
                                  desc, firstCreditIn, gender, hometown, id,
-                                 image, name, siteDetailUrl)
+                                 image, nameField, siteDetailUrl)
         of "platform", "platforms":
             if result.apiName == "platforms":
                 result.filters = @["field_list", "limit", "offset", "sort",
                                    "filter"]
             result.fieldList = newFieldList(abbreviation, apiDetailUrl, company, added,
                                  lastUpdated, summary, desc, id, image,
-                                 installBase, name, onlineSupport, origPrice,
+                                 installBase, nameField, onlineSupport, origPrice,
                                  releaseDate, siteDetailUrl)
         of "promo", "promos":
             if result.apiName == "promos":
                 result.filters = @["field_list", "limit", "offset", "sort",
                                    "filter"]
             result.fieldList = newFieldList(apiDetailUrl, added, summary,
-                                            id, image, link, name,
+                                            id, image, link, nameField,
                                             resourceType, user)
         of "rating_board", "rating_boards":
             if result.apiName == "raing_boards":
                 result.filters = @["field_list", "limit", "offset", "sort",
                                    "filter"]
             result.fieldList = newFieldList(apiDetailUrl, added, lastUpdated,
-                                            summary, desc, id, image, name,
+                                            summary, desc, id, image, nameField,
                                             region, siteDetailUrl)
         of "region":
             result.fieldList = newFieldList(apiDetailUrl, added, lastUpdated,
-                                            summary, desc, id, image, name,
+                                            summary, desc, id, image, nameField,
                                             siteDetailUrl)    
         of "regions":
             result.filters = @["field_list", "limit", "offset", "sort",
                                 "filter"]
             result.fieldList = newFieldList(apiDetailUrl, added, lastUpdated,
-                                            summary, desc, id, image, name,
+                                            summary, desc, id, image, nameField,
                                             siteDetailUrl)
         of "release", "releases":
             if result.apiName == "releases":
@@ -360,7 +361,7 @@ proc newResource*(resType: ResourceType): Resource =
                                             expReleaseMon, expReleaseQrtr,
                                             expReleaseYear, game, gameRating,
                                             id, image, maxPlayers, minPlayers,
-                                            multiFeatures, name, platform,
+                                            multiFeatures, nameField, platform,
                                             prodCodeType, prodCodeVal, region,
                                             releaseDate, resolutions, spFeatures,
                                             soundSystems, siteDetailUrl,
@@ -383,7 +384,7 @@ proc newResource*(resType: ResourceType): Resource =
             if result.apiName == "themes":
                 result.filters = @["field_list", "limit", "offset", "sort",
                                    "filter"]
-            result.fieldList = newFieldList(apiDetailUrl, id, name,
+            result.fieldList = newFieldList(apiDetailUrl, id, nameField,
                                             siteDetailUrl)
         of "type", "types":
             result.filters = @[]
@@ -392,7 +393,7 @@ proc newResource*(resType: ResourceType): Resource =
             if result.apiName == "themes":
                 result.filters = @["field_list", "limit", "offset", "sort",
                                    "filter"]
-            result.fieldList = newFieldList(apiDetailUrl, id, name,
+            result.fieldList = newFieldList(apiDetailUrl, id, nameField,
                                             siteDetailUrl)
         of "user_review", "user_reviews":
             if result.apiName == "user_reviews":
@@ -413,31 +414,42 @@ proc newResource*(resType: string): Resource =
     return newResource(rtError)
 
 proc getStr*(field: Field): string =
+    ## Gets the string content of a field if its of type fkStr.
+    ## Otherwise returns an empty string.
     if field.kind != fkStr:
         result = ""
     else:
         result = field.strContent
 
 proc getInt*(field: Field): int =
+    ## Gets the interger content of a field if its of type fkInt.
+    ## Otherwise returns 0.
     if field.kind != fkInt:
         result = 0
     else:
         result = field.intContent
 
 proc getRes*(field: Field): Resource =
+    ## Gets the resource content of a field if its of type fkRes.
+    ## Otherwise returns an "error" resource.
     if field.kind != fkRes:
         result = newResource(rtError)
     else:
         result = field.resContent
 
 proc getField*(fl: FieldList, name: string): Field =
-    try:
-        result = filter(fl, proc(x: Field): bool = x.apiName == name)[0]
-    except:
-        result = Field(apiName: "error", kind: fkStr)
-        result.setContent("error")
+    ## Tries to get a field based on the name passed.
+    ## Returns an "error" field if it doesn't exist.
+    for field in fl:
+        if field.apiName == name:
+            return field 
+
+    result = Field(apiName: "error", kind: fkStr)
+    result.setContent("This field does not exist") #??
 
 proc getField*(fl: FieldList, field: FieldObject): Field =
+    ## Tries to get a field based on the api name of the field passed.
+    ## Returns an "error" field if it doesn't exist.
     result = getField(fl, field.apiName) 
 
 proc `$`*(field: Field): string =
@@ -450,5 +462,7 @@ proc `$`*(field: Field): string =
             result = $(field.getRes())
 
 proc `$`*(resource: Resource): string =
-    result = resource.fieldList.getField(name).getStr()
-
+    try:
+        result = resource.fieldList.getField(nameField).getStr()
+    except:
+        result = "Not implemented"
