@@ -3,3 +3,4 @@
 !*.nim
 !*.nims
 !*.nimble
+!*.json
