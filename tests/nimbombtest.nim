@@ -1,12 +1,12 @@
 import "../src/nimbomb"
 import json
+import os
 
 when isMainModule:
-    block:
+    block parseTest:
+        let test = parseFile(getCurrentDir() / "tests/testresponse.json")
+        let results = jsonToRes(test["results"].getElems())
+        assert($results[0].fieldList.getField(nameField) == "Zelda")
+    block gBConnectTest:
         var nimbomber = newNimbombClient()
-        let sResults = nimbomber.search("halo", rtGame)
-        assert( nimbomber.lastResponse.error == "OK")
-        let game = nimbomber.get(sResults[0])
-        echo($game)
-        for field in game.fieldList:
-            echo($field)
+        let results = nimbomber.search("halo")

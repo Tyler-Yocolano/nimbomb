@@ -27,7 +27,7 @@ type
                 resContent: Resource
             of fkArr:
                 arrContent: seq[Resource]
-                arrKind: ResourceType
+                arrKind*: ResourceType
 
     ResourceRef* = ref Resource
 

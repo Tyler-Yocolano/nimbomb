@@ -3,8 +3,7 @@
 import os
 import httpclient, json, uri,tables
 import strutils
-
-include resources.resource # This is included for control over Resources.
+include resources.resource 
 
 # - Type definitions
 
@@ -40,11 +39,11 @@ proc jsonToRes*(element: JsonNode, resType: string): Resource =
             of JString:
                 let cont = val.getStr()
                 result.fieldList.getField(key).setContent(cont)
-                echo(key & " set to: " & $result.fieldList.getField(key))
+                #echo(key & " set to: " & $result.fieldList.getField(key))
             of JInt:
                 let cont = val.getNum().int
                 result.fieldList.getField(key).setContent(cont)
-                echo(key & " set to: " & $result.fieldList.getField(key))
+                #echo(key & " set to: " & $result.fieldList.getField(key))
             of JObject:
                 try:
                     let cont = jsonToRes(val, key)
@@ -127,12 +126,13 @@ proc get*(nimbClient: var NimbombClient, adu: string, resourceType: ResourceType
     nimbClient.lastResponse = parseResponse(resp)
 
 proc get*(nimbClient: var NimbombClient, fromSearch: Resource, filters: varargs[FieldObject]): Resource =
+    ## Gets the full resource info from the api using the api_detail_url from the searched resource.
     var qStruct = fromSearch.fieldList.getField(apiDetailUrl).getStr() / ("?api_key=" & nimbClient.apiKey & "&format=json&field_list=")
     for i in 0..<filters.len:
         qStruct = qStruct / filters[i].apiName
         if i != <filters.len:
             qStruct = qStruct / ","
-    echo $qStruct
+    #echo $qStruct
     let resp = nimbClient.client.getContent($qStruct)
     nimbClient.lastResponse = parseResponse(resp)
     result = nimbClient.lastResponse.result.jsonToRes($fromSearch.resourceType)
