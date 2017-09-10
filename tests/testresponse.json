@@ -1,0 +1,73 @@
+{
+    "error": "OK",
+    "limit": 10,
+    "offset": 0,
+    "number_of_page_results": 2,
+    "number_of_total_results": 2,
+    "status_code": 1,
+    "results": [
+      {
+        "aliases": "Princess Zelda\r\nSheik\r\nShiek\r\nTetra\r\nQueen Zelda\r\nHylia",
+        "api_detail_url": "https://www.giantbomb.com/api/character/3005-5/",
+        "birthday": null,
+        "date_added": "2008-05-06 16:37:09",
+        "date_last_updated": "2017-04-02 05:23:55",
+        "deck": "Zelda is the titular figure of The Legend of Zelda. She is most often depicted as the princess of Hyrule.",
+        "description": "Empty for test purposes",
+        "gender": 2,
+        "id": 5,
+        "image": {
+          "icon_url": "https://www.giantbomb.com/api/image/square_avatar/9876-zelda.jpg",
+          "medium_url": "https://www.giantbomb.com/api/image/scale_medium/9876-zelda.jpg",
+          "screen_url": "https://www.giantbomb.com/api/image/screen_medium/9876-zelda.jpg",
+          "screen_large_url": "https://www.giantbomb.com/api/image/screen_kubrick/9876-zelda.jpg",
+          "small_url": "https://www.giantbomb.com/api/image/scale_small/9876-zelda.jpg",
+          "super_url": "https://www.giantbomb.com/api/image/scale_large/9876-zelda.jpg",
+          "thumb_url": "https://www.giantbomb.com/api/image/scale_avatar/9876-zelda.jpg",
+          "tiny_url": "https://www.giantbomb.com/api/image/square_mini/9876-zelda.jpg"
+        },
+        "last_name": null,
+        "name": "Zelda",
+        "real_name": null,
+        "site_detail_url": "https://www.giantbomb.com/zelda/3005-5/",
+        "first_appeared_in_game": {
+          "api_detail_url": "https://www.giantbomb.com/api/game/3030-11949/",
+          "id": 11949,
+          "name": "The Legend of Zelda"
+        },
+        "resource_type": "character"
+      },
+      {
+        "aliases": null,
+        "api_detail_url": "https://www.giantbomb.com/api/character/3005-34217/",
+        "birthday": null,
+        "date_added": "2016-12-17 10:38:39",
+        "date_last_updated": "2016-12-17 11:11:34",
+        "deck": "Playable character in the game Bug Eyes by Icon Software.",
+        "description": null,
+        "gender": 0,
+        "id": 34217,
+        "image": {
+          "icon_url": "https://www.giantbomb.com/api/image/square_avatar/2906563-bug_eyes_-_agent_zelda.jpg",
+          "medium_url": "https://www.giantbomb.com/api/image/scale_medium/2906563-bug_eyes_-_agent_zelda.jpg",
+          "screen_url": "https://www.giantbomb.com/api/image/screen_medium/2906563-bug_eyes_-_agent_zelda.jpg",
+          "screen_large_url": "https://www.giantbomb.com/api/image/screen_kubrick/2906563-bug_eyes_-_agent_zelda.jpg",
+          "small_url": "https://www.giantbomb.com/api/image/scale_small/2906563-bug_eyes_-_agent_zelda.jpg",
+          "super_url": "https://www.giantbomb.com/api/image/scale_large/2906563-bug_eyes_-_agent_zelda.jpg",
+          "thumb_url": "https://www.giantbomb.com/api/image/scale_avatar/2906563-bug_eyes_-_agent_zelda.jpg",
+          "tiny_url": "https://www.giantbomb.com/api/image/square_mini/2906563-bug_eyes_-_agent_zelda.jpg"
+        },
+        "last_name": null,
+        "name": "Agent Zelda ",
+        "real_name": null,
+        "site_detail_url": "https://www.giantbomb.com/agent-zelda/3005-34217/",
+        "first_appeared_in_game": {
+          "api_detail_url": "https://www.giantbomb.com/api/game/3030-57375/",
+          "id": 57375,
+          "name": "Bug Eyes"
+        },
+        "resource_type": "character"
+      }
+    ],
+    "version": "1.0"
+  }
