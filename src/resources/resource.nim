@@ -1,7 +1,6 @@
 # Defines the resources and fields contained within a request.
 
 import sequtils, strutils
-include resourcetypes
 
 # - Type definitions
 type
@@ -27,7 +26,7 @@ type
                 resContent: Resource
             of fkArr:
                 arrContent: seq[Resource]
-                arrKind*: ResourceType
+                arrKind*: string 
 
     ResourceRef* = ref Resource
 
@@ -39,7 +38,6 @@ type
                                 ## during a search.
         fieldList*: FieldList   ## The fields that will appear for the
                                 ## object.
-        resourceType*: ResourceType 
 
     FieldList* = seq[Field]
 
@@ -53,7 +51,7 @@ proc newField*(apiName: string, sortable, filterable: bool = false,
     result.filterable = filterable
     result.kind = fKind
 
-proc newField*(apiName: string, arrKind: ResourceType, sortable,
+proc newField*(apiName: string, arrKind: string, sortable,
                filterable: bool = false): FieldObject =
     result.apiName = apiName
     result.sortable = sortable
@@ -100,11 +98,11 @@ let
     aliases*        = newField("aliases", filterable = true)
     apiDetailUrl*   = newField("api_detail_url")
     birthday*       = newField("birth_date", true, true)
-    characters*     = newField("characters", rtCharacter)
+    characters*     = newField("characters", "character")
     channelName*    = newField("channel_name")
-    concepts*       = newField("concepts", rtConcept)
+    concepts*       = newField("concepts", "concept")
     company*        = newField("company", fKind = fkRes)
-    companies*      = newField("companies", rtCompany)
+    companies*      = newField("companies", "company")
     country*        = newField("country", true, true)
     added*          = newField("date_added", true, true)
     founded*        = newField("date_founded", true, true)
@@ -124,26 +122,26 @@ let
     expReleaseQrtr* = newField("expected_release_quarter", filterable = true)
     expReleaseYear* = newField("expected_release_year", filterable = true)
     firstFranchise* = newField("first_appeared_in_franchise")
-    firstChars*     = newField("first_appearance_characters", rtCharacter)
-    firstConcepts*  = newField("first_appearance_concepts", rtConcept)
-    firstInGame*    = newField("first_appeared_in_game", rtGame)
-    firstLocs*      = newField("first_appearance_locations", rtLocation)
-    firstObjects*   = newField("first_appearance_objects", rtObject)
-    firstPeople*    = newField("first_appearance_people", rtPeople)
+    firstChars*     = newField("first_appearance_characters", "character")
+    firstConcepts*  = newField("first_appearance_concepts", "concept")
+    firstInGame*    = newField("first_appeared_in_game", "game")
+    firstLocs*      = newField("first_appearance_locations", "location")
+    firstObjects*   = newField("first_appearance_objects", "objet")
+    firstPeople*    = newField("first_appearance_people", "person")
     firstCreditIn*  = newField("first_credited_game", fKind = fkRes)
-    franchises*     = newField("franchises", rtFranchise)
+    franchises*     = newField("franchises", "franchise")
     friends*        = newField("friends", fkind = fkRes)
     game*           = newField("game", filterable = true, fKind = fkRes)
     gameRating*     = newField("game_rating")
-    games*          = newField("games", rtGame)
-    genres*         = newField("genres", rtGenre)
+    games*          = newField("games", "game")
+    genres*         = newField("genres", "genre")
     gender*         = newField("gender", true, true, fkind = fkInt)
     hometown*       = newField("hometown", true, true)
     id*             = newField("id", true, true, fkInt)
     image*          = newField("image", fKind = fkRes)
-    images*         = newField("images", rtImage)
+    images*         = newField("images", "image")
     installBase*    = newField("install_base", true, true)
-    killedChars*    = newField("killed_characters", rtCharacter)
+    killedChars*    = newField("killed_characters", "character")
     lastName*       = newField("last_name")
     link*           = newField("link")
     listResName*    = newField("list_resource_name")
@@ -151,27 +149,27 @@ let
     locCity*        = newField("location_city")
     locCountry*     = newField("location_country")
     locState*       = newField("location_state")
-    locations*      = newField("locations", rtLocation)
+    locations*      = newField("locations", "location")
     maxPlayers*     = newField("maximum_players", fkind = fkInt)
     minPlayers*     = newField("minimum_players", fkind = fkInt)
     multiFeatures*  = newField("multiplayer_features")
     nameField*      = newField("name", true, true)
     amtUserReviews* = newField("number_of_user_reviews", fkind = fkInt)
-    objects*        = newField("objects", rtObject)
-    origGameRating* = newField("original_game_rating", rtGameRt)
+    objects*        = newField("objects", "object")
+    origGameRating* = newField("original_game_rating", "game_rating")
     origRlsDate*    = newField("original_release_date")
     onlineSupport*  = newField("online_support", true, true)
     origPrice*      = newField("original_price", true, true)
     password*       = newField("password")
-    people*         = newField("people", rtPerson)
+    people*         = newField("people", "person")
     phone*          = newField("phone")
     platform*       = newField("platform", true, true, fkRes)
-    platforms*      = newField("platforms", rtPlatform)
+    platforms*      = newField("platforms", "platform")
     prodCodeType*   = newField("product_code_type")
     prodCodeVal*    = newField("product_code_value")
     pubGames*       = newField("published_games")
     pubReleases*    = newField("published_releases")
-    publishers*     = newField("publishers", rtPublisher)
+    publishers*     = newField("publishers", "publisher")
     publishDate*    = newFIeld("publish_date")
     ratingBoard*    = newField("rating_board", true, true, fkRes)
     realName*       = newField("real_name")
@@ -179,22 +177,22 @@ let
     relatedCons*    = newField("related_concepts")
     releaseDate*    = newField("release_date", sortable = true)
     release*        = newField("release", fkind = fkRes)
-    releases*       = newField("releases", rtRelease)
+    releases*       = newField("releases", "release")
     resolutions*    = newField("resolutions")
     resourceType*   = newField("resource_type")
     reviewer*       = newField("reviewer")
     dlcs*           = newField("dlcs", fKind = fkRes)
     reviews*        = newField("reviews", fKind = fkRes)
     score*          = newField("score")
-    similarGames*   = newField("similarGames", rtGame)
+    similarGames*   = newField("similarGames", "game")
     siteDetailUrl*  = newField("site_detail_url")
     soundSystems*   = newField("sound_system")
     spFeatures*     = newField("singleplayer_features")
     title*          = newField("title")
-    themes*         = newField("themes", rtTheme)
+    themes*         = newField("themes", "theme")
     website*        = newField("website")
     user*           = newField("user")
-    videos*         = newField("videos", rtVideo)
+    videos*         = newField("videos", "video")
     widescreen*     = newField("widescreen_support")
 
     # Image only fields
@@ -208,7 +206,7 @@ let
     tinyUrl*        = newField("tiny_url")
 # Yowza..
 
-proc newResource*(resType: ResourceType): Resource =
+proc newResource*(resType: string): Resource =
     ## Creates a new resource and fills in the field list based on its type.
     ## Can be found at https://www.giantbomb.com/api/documentation
     result.apiName = $resType
@@ -434,15 +432,6 @@ proc newResource*(resType: ResourceType): Resource =
                                             score, siteDetailUrl)
         # TODO: Finish this.
 
-proc newResource*(resType: string): Resource =
-    ## Helper for creating a resource from a string.
-    ## Will create an 'Error' resource if the string doesn't match
-    ## to a ResourceType.
-    for t in ResourceType.items:
-        if $t == resType:
-            return newResource(t)
-    return newResource(rtError)
-
 proc getStr*(field: Field): string =
     ## Gets the string content of a field if its of type fkStr.
     ## Otherwise returns an empty string.
@@ -463,7 +452,7 @@ proc getRes*(field: Field): Resource =
     ## Gets the resource content of a field if its of type fkRes.
     ## Otherwise returns an "error" resource.
     if field.kind != fkRes:
-        result = newResource(rtError)
+        result = newResource("error")
     else:
         result = field.resContent
 
