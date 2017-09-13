@@ -211,7 +211,6 @@ proc newResource*(resType: string): Resource =
     ## Can be found at https://www.giantbomb.com/api/documentation
     result.apiName = $resType
     result.filters = @["field_list"]
-    result.resourceType = resType
 
     case result.apiName:
         of "accessory", "accessories":
