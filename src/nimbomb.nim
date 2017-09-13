@@ -103,7 +103,7 @@ proc parseResponse(data: string): JsonResponse =
     result.result = dataJson["results"]
 
 proc search*(nimbClient: var NimbombClient, query: string,
-             resources: varargs[string] = "game"): seq[Resource] =
+             resources: varargs[string] = ["game"]): seq[Resource] =
     ## Search function to find any type of resource offered in the wiki.
     var qStruct = nimbClient.url
     var appends: seq[string] = @[]
@@ -111,9 +111,9 @@ proc search*(nimbClient: var NimbombClient, query: string,
     appends.add("search")
     appends.add("?api_key=" & nimbClient.apiKey & "&format=json&query=%22" & toSearch & "%22&resources=")
     for i in 0 .. <resources.len:
-        appends[<appends.len].add(resources[i])
+        appends.add(resources[i])
         if i != <resources.len:
-            appends[<appends.len].add(",")
+            appends.add(",")
     for path in appends:
         qStruct = qStruct / path
     let resp = nimbClient.client.getContent($qStruct)
