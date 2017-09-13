@@ -3,7 +3,10 @@
 import os
 import httpclient, json, uri,tables
 import strutils
-include resources.resource 
+import nimbomb/[nbfield, nbresource, nbtypes]
+
+export
+    nimbomb.nbfield
 
 # - Type definitions
 

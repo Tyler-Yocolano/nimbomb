@@ -1,4 +1,4 @@
-import "../src/nimbomb"
+import "../nimbomb"
 import json
 import os
 
