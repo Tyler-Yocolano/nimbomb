@@ -9,3 +9,4 @@ license       = "MIT"
 
 requires "nim >= 0.17.1"
 
+skipDirs = @["tests"]
