@@ -6,7 +6,7 @@ when isMainModule:
     block parseTest:
         let test = parseFile(getCurrentDir() / "tests/testresponse.json")
         let results = jsonToRes(test["results"].getElems())
-        assert($results[0].fieldList.getField(nameField) == "Zelda", "Error: something is wrong with the Json2Resource parser.")
+        assert($results[0].fieldList.getField(name) == "Zelda", "Error: something is wrong with the Json2Resource parser.")
     block gBConnectTest:
         var nimbomber = newNimbombClient()
         let results = nimbomber.search("halo")
