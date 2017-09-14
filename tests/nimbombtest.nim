@@ -11,5 +11,5 @@ when isMainModule:
     block gBConnectTest:
         var nimbomber = newNimbombClient()
         let results = nimbomber.search("halo")
-        echo nimbomber.get(results[0])
+        let game = nimbomber.get(results[0])
         assert(nimbomber.lastResponse.error == "OK", "Error: " & nimbomber.lastResponse.error)

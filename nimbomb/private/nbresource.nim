@@ -3,6 +3,7 @@
 import sequtils, strutils
 import nbtypes
 import nbfield
+import "../nbfieldlist"
 
 export Resource, FieldList
 

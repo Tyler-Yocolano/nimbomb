@@ -71,7 +71,7 @@ proc get*(nimbClient: var NimbombClient, fromSearch: Resource, filters: varargs[
     nimbClient.lastResponse = parseResponse(resp)
     result = nimbClient.lastResponse.result.jsonToRes($fromSearch.apiName)
 
-proc getField*(resource: Resource, field: FieldObj): Field =
+proc getField*(resource: Resource, field: string): Field =
     result = resource.fieldList.getField(field)
 
 proc `$`*(resource: Resource): string =
