@@ -59,7 +59,7 @@ proc get*(nimbClient: var NimbombClient, adu: string): Resource =
     let resp = nimbClient.client.getContent($qStruct)
     nimbClient.lastResponse = parseResponse(resp)
 
-proc get*(nimbClient: var NimbombClient, fromSearch: Resource, filters: varargs[FieldObject]): Resource =
+proc get*(nimbClient: var NimbombClient, fromSearch: Resource, filters: varargs[FieldObj]): Resource =
     ## Gets the full resource info from the api using the api_detail_url from the searched resource.
     var qStruct = fromSearch.fieldList.getField(apiDetailUrl).getStr() / ("?api_key=" & nimbClient.apiKey & "&format=json&field_list=")
     for i in 0..<filters.len:
@@ -71,7 +71,7 @@ proc get*(nimbClient: var NimbombClient, fromSearch: Resource, filters: varargs[
     nimbClient.lastResponse = parseResponse(resp)
     result = nimbClient.lastResponse.result.jsonToRes($fromSearch.apiName)
 
-proc getField*(resource: Resource, field: FieldObject): Field =
+proc getField*(resource: Resource, field: FieldObj): Field =
     result = resource.fieldList.getField(field)
 
 proc `$`*(resource: Resource): string =
