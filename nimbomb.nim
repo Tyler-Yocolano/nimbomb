@@ -74,7 +74,7 @@ proc get*(nimbClient: var NimbombClient, fromSearch: Resource, filters: varargs[
             appends[<appends.len].add(",")
     for path in appends:
         qStruct = qStruct / path
-    echo $qStruct
+    #echo $qStruct
     let resp = nimbClient.client.getContent($qStruct)
     nimbClient.lastResponse = parseResponse(resp)
     result = nimbClient.lastResponse.result.jsonToRes($fromSearch.apiName)
@@ -98,15 +98,18 @@ proc `$`*(field: Field): string =
             result = field.apiName & ":"
             for res in field.getArr():
                 result.add("\n\t" & $res)
-            result.setLen(<result.len)
 
 proc printNonEmpty*(resource: Resource, labels: bool = false) =
     for field in resource.fieldList:
         let str = $field
-        if str == field.apiName:
+        if str == field.apiName & ":":
             continue
         case str:
             of ["0", nil, "Err: Field not yet implemented"]:
                 continue
             else:
-                echo str
+                var toPrint = ""
+                if labels and (not str.startsWith(field.apiName)):
+                    toPrint.add(field.apiName & ": ")
+                toPrint.add(str)
+                echo(toPrint)
