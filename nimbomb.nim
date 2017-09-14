@@ -3,27 +3,12 @@
 import os
 import httpclient, json, uri,tables
 import strutils
-import nimbomb/[nbfield, nbresource, nbtypes]
-
-export
-    nimbomb.nbfield
+import nimbomb/private/[nbfield, nbresource, nbtypes]
+import nimbomb.nbjson
 
 # - Type definitions
 
 type 
-    JsonResponse* = object
-        ## The response from GB will always be given with these fields.
-        error*: string              ## This should read "OK".
-        limit*: int                 ## The amount of results to show.
-        offset*: int                ## ???
-        pgResults*: int             ## The number of results shown.
-        totalResults*: int          ## Total number of results.
-        statusCode*: int            ## An integer indicating the 
-                                    ## result of the request.
-        results*: seq[JsonNode]     ## The results to be turned into Resources
-                                    ## or Field content.
-        result*: JsonNode
-
     NimbombClient* = object
         ## Client used to communicate to the GiantBomb Wiki API.
         client: HttpClient          ## An HttpClient used to make requests.
@@ -34,76 +19,17 @@ type
                                     ## within the app directory.
         lastResponse*: JsonResponse ## The last jsonresponse from the server.
 
-proc jsonToRes*(element: JsonNode, resType: string): Resource =
-    ## Converts a json node to a resource.
-    result = newResource(resType)
-    for key, val in pairs(element.getFields()): #Iterate through the node's k/v pairs.
-        case val.kind:
-            of JString:
-                let cont = val.getStr()
-                result.fieldList.getField(key).setContent(cont)
-                #echo(key & " set to: " & $result.fieldList.getField(key))
-            of JInt:
-                let cont = val.getNum().int
-                result.fieldList.getField(key).setContent(cont)
-                #echo(key & " set to: " & $result.fieldList.getField(key))
-            of JObject:
-                try:
-                    let cont = jsonToRes(val, key)
-                    result.fieldList.getField(key).setContent(cont)
-                except:
-                    # If the field doesn't exist, return an error.
-                    result = newResource("error")
-                #echo(key & " set to: " & $result.fieldList.getField(key))
-            of JArray:
-                var list: seq[Resource] = @[]
-                for obj in val:
-                    try:
-                        let arrRes = result.fieldList.getField(key).arrKind
-                        let cont = jsonToRes(obj, $arrRes)
-                        list.add(cont)
-                    except:
-                        discard
-                result.fieldList.getField(key).setContent(list)
-            else:
-                discard
-
-
-proc jsonToRes*(response: seq[JsonNode]): seq[Resource] =
-    result = @[]
-    for elem in response:
-        var newRes = jsonToRes(elem, elem["resource_type"].getStr())
-        result.add(newRes)
-
-let api = getCurrentDir() / "giantbomb.api" # Points to the api-key file.
+    Content* = object of Resource
+                            
 
 proc newNimbombClient*(): NimbombClient =
     ## Creates a new nimbomb client preset to giantbomb's api address.
+    let api = getCurrentDir() / "giantbomb.api" # Points to the api-key file.
     result.apiKey = open(api).readLine()
     result.client = newHttpClient()
     result.client.headers = newHttpHeaders({ "Content-Type" :
                                              "application/json"})
     result.url = initUri() / "http://www.giantbomb.com/api/"
-
-proc parseSearch(data: string): JsonResponse =
-    let dataJson = parseJson(data)
-    result.error = dataJson["error"].getStr()
-    result.limit = dataJson["limit"].getNum().int
-    result.offset = dataJson["offset"].getNum().int
-    result.pgResults = dataJson["number_of_page_results"].getNum().int
-    result.totalResults = dataJson["number_of_total_results"].getNum().int
-    result.statusCode = dataJson["status_code"].getNum().int
-    result.results = dataJson["results"].getElems()
-
-proc parseResponse(data: string): JsonResponse =
-    let dataJson = parseJson(data)
-    result.error = dataJson["error"].getStr()
-    result.limit = dataJson["limit"].getNum().int
-    result.offset = dataJson["offset"].getNum().int
-    result.pgResults = dataJson["number_of_page_results"].getNum().int
-    result.totalResults = dataJson["number_of_total_results"].getNum().int
-    result.statusCode = dataJson["status_code"].getNum().int
-    result.result = dataJson["results"]
 
 proc search*(nimbClient: var NimbombClient, query: string,
              resources: varargs[string] = ["game"]): seq[Resource] =
@@ -120,7 +46,7 @@ proc search*(nimbClient: var NimbombClient, query: string,
     for path in appends:
         qStruct = qStruct / path
     let resp = nimbClient.client.getContent($qStruct)
-    nimbClient.lastResponse = parseSearch(resp)
+    nimbClient.lastResponse = parseResponse(resp, true)
     result = jsonToRes(nimbClient.lastResponse.results)
 
 proc get*(nimbClient: var NimbombClient, adu: string): Resource =
