@@ -64,12 +64,16 @@ proc get*(nimbClient: var NimbombClient, adu: string): Resource =
 
 proc get*(nimbClient: var NimbombClient, fromSearch: Resource, filters: varargs[FieldObj]): Resource =
     ## Gets the full resource info from the api using the api_detail_url from the searched resource.
-    var qStruct = fromSearch.getField(apiDetailUrl).getStr() / ("?api_key=" & nimbClient.apiKey & "&format=json&field_list=")
+    var qStruct = fromSearch.getField(apiDetailUrl).getStr() 
+    var appends: seq[string] = @[]
+    appends.add("?api_key=" & nimbClient.apiKey & "&format=json&field_list=")
     for i in 0..<filters.len:
-        qStruct = qStruct / filters[i].apiName
+        appends[<appends.len].add(filters[i].apiName)
         if i != <filters.len:
-            qStruct = qStruct / ","
-    #echo $qStruct
+            appends[<appends.len].add(",")
+    for path in appends:
+        qStruct = qStruct / path
+    echo $qStruct
     let resp = nimbClient.client.getContent($qStruct)
     nimbClient.lastResponse = parseResponse(resp)
     result = nimbClient.lastResponse.result.jsonToRes($fromSearch.apiName)
@@ -90,7 +94,18 @@ proc `$`*(field: Field): string =
         of fkRes:
             result = $field.getRes()
         of fkArr:
-            result = field.apiName & ": \n"
+            result = field.apiName & ":"
             for res in field.getArr():
-                result.add("\t" & $res & "\n")
+                result.add("\n\t" & $res)
             result.setLen(<result.len)
+
+proc printNonEmpty*(resource: Resource, labels: bool = false) =
+    for field in resource.fieldList:
+        let str = $field
+        if str == field.apiName:
+            continue
+        case str:
+            of ["0", nil, "Err: Field not yet implemented"]:
+                continue
+            else:
+                echo str
