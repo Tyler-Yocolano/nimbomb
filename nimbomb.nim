@@ -7,6 +7,7 @@ import nimbomb/private/[nbfield, nbresource, nbtypes]
 import nimbomb.nbjson
 
 # - Type definitions
+export nimbomb.nbtypes
 
 type 
     NimbombClient* = object
@@ -19,17 +20,20 @@ type
                                     ## within the app directory.
         lastResponse*: JsonResponse ## The last jsonresponse from the server.
 
-    Content* = object of Resource
-                            
-
 proc newNimbombClient*(): NimbombClient =
     ## Creates a new nimbomb client preset to giantbomb's api address.
     let api = getCurrentDir() / "giantbomb.api" # Points to the api-key file.
-    result.apiKey = open(api).readLine()
+    try:
+        result.apiKey = open(api).readLine()
+    except:
+        discard
     result.client = newHttpClient()
     result.client.headers = newHttpHeaders({ "Content-Type" :
                                              "application/json"})
     result.url = initUri() / "http://www.giantbomb.com/api/"
+
+proc setAPIKey*(nimbombClient: var NimbombClient, apiKey: string) =
+    nimbombClient.apiKey = apiKey
 
 proc search*(nimbClient: var NimbombClient, query: string,
              resources: varargs[string] = ["game"]): seq[Resource] =
@@ -40,11 +44,12 @@ proc search*(nimbClient: var NimbombClient, query: string,
     appends.add("search")
     appends.add("?api_key=" & nimbClient.apiKey & "&format=json&query=%22" & toSearch & "%22&resources=")
     for i in 0 .. <resources.len:
-        appends.add(resources[i])
+        appends[<appends.len].add(resources[i])
         if i != <resources.len:
-            appends.add(",")
+            appends[<appends.len].add(",")
     for path in appends:
         qStruct = qStruct / path
+    #echo $qStruct
     let resp = nimbClient.client.getContent($qStruct)
     nimbClient.lastResponse = parseResponse(resp, true)
     result = jsonToRes(nimbClient.lastResponse.results)
@@ -65,3 +70,24 @@ proc get*(nimbClient: var NimbombClient, fromSearch: Resource, filters: varargs[
     let resp = nimbClient.client.getContent($qStruct)
     nimbClient.lastResponse = parseResponse(resp)
     result = nimbClient.lastResponse.result.jsonToRes($fromSearch.apiName)
+
+proc getField*(resource: Resource, field: FieldObject): Field =
+    result = resource.fieldList.getField(field)
+
+proc `$`*(resource: Resource): string =
+    var fl = resource.fieldList
+    if fl.hasField("name"):
+        result = resource.fieldList.getField(name).getStr()
+    else:
+        result = fl[0].apiName
+
+proc `$`*(field: Field): string =
+    case field.kind:
+        of fkStr:
+            result = field.getStr()
+        of fkInt:
+            result = $field.getInt()
+        of fkRes:
+            result = $field.getRes()
+        of fkArr:
+            result = field.arrKind

@@ -33,33 +33,33 @@ proc parseResponse*(data: string, search: bool = false): JsonResponse =
 proc jsonToRes*(element: JsonNode, resType: string): Resource =
     ## Converts a json node to a resource.
     result = newResource(resType)
+    #echo("Creating a " & resType & " resource.")
     for key, val in pairs(element.getFields()): #Iterate through the node's k/v pairs.
         case val.kind:
             of JString:
+                #echo("Got a string node.")
                 let cont = val.getStr()
                 result.fieldList.getField(key).setContent(cont)
                 #echo(key & " set to: " & $result.fieldList.getField(key))
             of JInt:
+                #echo("Got an int node.")
                 let cont = val.getNum().int
                 result.fieldList.getField(key).setContent(cont)
                 #echo(key & " set to: " & $result.fieldList.getField(key))
             of JObject:
-                try:
-                    let cont = jsonToRes(val, key)
-                    result.fieldList.getField(key).setContent(cont)
-                except:
-                    # If the field doesn't exist, return an error.
-                    result = newResource("error")
+                #echo("Got an object node.")
+                let cont = jsonToRes(val, key)
+                result.fieldList.getField(key).setContent(cont)
                 #echo(key & " set to: " & $result.fieldList.getField(key))
             of JArray:
+                #echo("Got an array node.")
                 var list: seq[Resource] = @[]
                 for obj in val:
-                    try:
-                        let arrRes = result.fieldList.getField(key).arrKind
-                        let cont = jsonToRes(obj, $arrRes)
-                        list.add(cont)
-                    except:
-                        discard
+                    #echo(key)
+                    let arrRes = result.fieldList.getField(key).arrKind
+                    #echo(arrRes)
+                    let cont = jsonToRes(obj, arrRes)
+                    list.add(cont)
                 result.fieldList.getField(key).setContent(list)
             else:
                 discard
