@@ -10,7 +10,8 @@ import nimbomb/[nbjson, nbfieldlist]
 export
     nimbomb.nbtypes,
     nbfieldlist,
-    getField, hasField
+    getField, hasField,
+    getArr, getStr, getInt
 
 type 
     NimbombClient* = object
