@@ -19,23 +19,23 @@ proc setContent*(field: Field, content: string | int | Resource | seq[Resource])
 
 proc getStr*(field: Field): string =
     ## Gets the string content of a field if its of type fkStr.
-    try:
+    if field.kind == fkStr:
         result = field.strContent
-    except:
-        result = "Empty"
+    else:
+        result = ""
 
 proc getInt*(field: Field): int =
     ## Gets the interger content of a field if its of type fkInt.
-    try:
+    if field.kind == fkInt:
         result = field.intContent
-    except:
+    else:
         result = 0
 
 proc getArr*(field: Field): seq[Resource] =
     ## Gets the sequence of Resrouces held by this field if its of type fkArr.
-    try:
+    if field.kind == fkArr:
         result = field.arrContent
-    except:
+    else:
         result = @[]
 
 proc newField*(apiName: string, sortable, filterable: bool = false,
@@ -70,23 +70,7 @@ proc newFieldList*(foList: varargs[FieldObj]) : FieldList =
             f.arrKind = fo.arrKind
         result.add(f)
 
-proc getField*(fl: FieldList, name: string): Field =
-    ## Tries to get a field based on the name passed.
-    ## Returns an "error" field if it doesn't exist.
-    for field in fl:
-        if field.apiName == name:
-            return field
 
-    result = Field(apiName: "error", kind: fkStr)
-    result.setContent("This field does not exist") #??
-
-proc getField*(fl: FieldList, field: FieldObj): Field =
-    ## Tries to get a field based on the api name of the field passed.
-    ## Returns an "error" field if it doesn't exist.
-    result = getField(fl, field.apiName) 
-
-proc hasField*(fl: FieldList, has: string): bool =
-    result = fl.getField(has).apiName != "error"
 
 
 

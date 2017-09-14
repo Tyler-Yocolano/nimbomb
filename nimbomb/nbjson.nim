@@ -39,28 +39,28 @@ proc jsonToRes*(element: JsonNode, resType: string): Resource =
             of JString:
                 #echo("Got a string node.")
                 let cont = val.getStr()
-                result.fieldList.getField(key).setContent(cont)
+                result.getField(key).setContent(cont)
                 #echo(key & " set to: " & $result.fieldList.getField(key))
             of JInt:
                 #echo("Got an int node.")
                 let cont = val.getNum().int
-                result.fieldList.getField(key).setContent(cont)
+                result.getField(key).setContent(cont)
                 #echo(key & " set to: " & $result.fieldList.getField(key))
             of JObject:
                 #echo("Got an object node.")
                 let cont = jsonToRes(val, key)
-                result.fieldList.getField(key).setContent(cont)
+                result.getField(key).setContent(cont)
                 #echo(key & " set to: " & $result.fieldList.getField(key))
             of JArray:
                 #echo("Got an array node.")
                 var list: seq[Resource] = @[]
                 for obj in val:
                     #echo(key)
-                    let arrRes = result.fieldList.getField(key).arrKind
+                    let arrRes = result.getField(key).arrKind
                     #echo(arrRes)
                     let cont = jsonToRes(obj, arrRes)
                     list.add(cont)
-                result.fieldList.getField(key).setContent(list)
+                result.getField(key).setContent(list)
             else:
                 discard
 

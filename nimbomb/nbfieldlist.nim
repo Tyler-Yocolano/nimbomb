@@ -35,7 +35,7 @@ let
     firstFranchise* = newField("first_appeared_in_franchise")
     firstChars*     = newField("first_appearance_characters", "character")
     firstConcepts*  = newField("first_appearance_concepts", "concept")
-    firstInGame*    = newField("game", fKind = fkRes)
+    firstInGame*    = newField("first_appeared_in_game", fKind = fkRes)
     firstLocs*      = newField("first_appearance_locations", "location")
     firstObjects*   = newField("first_appearance_objects", "object")
     firstPeople*    = newField("first_appearance_people", "person")

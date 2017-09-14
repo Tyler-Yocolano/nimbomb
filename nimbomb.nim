@@ -1,13 +1,16 @@
 # The main module to import when using this library.
 
 import os
-import httpclient, json, uri,tables
+import httpclient, uri
 import strutils
 import nimbomb/private/[nbfield, nbresource, nbtypes]
-import nimbomb.nbjson
+import nimbomb/[nbjson, nbfieldlist]
 
 # - Type definitions
-export nimbomb.nbtypes
+export
+    nimbomb.nbtypes,
+    nbfieldlist,
+    getField, hasField
 
 type 
     NimbombClient* = object
@@ -61,7 +64,7 @@ proc get*(nimbClient: var NimbombClient, adu: string): Resource =
 
 proc get*(nimbClient: var NimbombClient, fromSearch: Resource, filters: varargs[FieldObj]): Resource =
     ## Gets the full resource info from the api using the api_detail_url from the searched resource.
-    var qStruct = fromSearch.fieldList.getField(apiDetailUrl).getStr() / ("?api_key=" & nimbClient.apiKey & "&format=json&field_list=")
+    var qStruct = fromSearch.getField(apiDetailUrl).getStr() / ("?api_key=" & nimbClient.apiKey & "&format=json&field_list=")
     for i in 0..<filters.len:
         qStruct = qStruct / filters[i].apiName
         if i != <filters.len:
@@ -71,15 +74,12 @@ proc get*(nimbClient: var NimbombClient, fromSearch: Resource, filters: varargs[
     nimbClient.lastResponse = parseResponse(resp)
     result = nimbClient.lastResponse.result.jsonToRes($fromSearch.apiName)
 
-proc getField*(resource: Resource, field: string): Field =
-    result = resource.fieldList.getField(field)
-
 proc `$`*(resource: Resource): string =
-    var fl = resource.fieldList
-    if fl.hasField("name"):
-        result = resource.fieldList.getField(name).getStr()
+    var fl = resource
+    if fl.hasField(name):
+        result = resource.getField(name).getStr()
     else:
-        result = fl[0].apiName
+        result = resource.getField(siteDetailUrl).getStr() 
 
 proc `$`*(field: Field): string =
     case field.kind:
@@ -90,4 +90,7 @@ proc `$`*(field: Field): string =
         of fkRes:
             result = $field.getRes()
         of fkArr:
-            result = field.arrKind
+            result = field.apiName & ": \n"
+            for res in field.getArr():
+                result.add("\t" & $res & "\n")
+            result.setLen(<result.len)

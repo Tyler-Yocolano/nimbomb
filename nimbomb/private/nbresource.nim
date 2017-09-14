@@ -234,7 +234,23 @@ proc newResource*(resType: string): Resource =
         # TODO: Finish this.
 
 
+proc getField*(resource: Resource, name: string): Field =
+    ## Tries to get a field based on the name passed.
+    ## Returns an "error" field if it doesn't exist.
+    for field in resource.fieldList:
+        if field.apiName == name:
+            return field
 
+    result = Field(apiName: "error", kind: fkStr)
+    result.setContent("Err: Field not yet implemented") #??
+
+proc getField*(resource: Resource, field: FieldObj): Field =
+    ## Tries to get a field based on the api name of the field passed.
+    ## Returns an "error" field if it doesn't exist.
+    result = getField(resource, field.apiName) 
+
+proc hasField*(resource: Resource, has: FieldObj): bool =
+    result = resource.getField(has.apiName).apiName != "error"
 
 proc getRes*(field: Field): Resource =
     ## Gets the resource content of a field if its of type fkRes.
