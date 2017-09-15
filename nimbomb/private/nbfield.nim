@@ -38,6 +38,10 @@ proc getArr*(field: Field): seq[Resource] =
     else:
         result = @[]
 
+proc `[]`*(field: Field, i: int): Resource {. inline .}=
+    assert(field.kind == fkArr and field.getArr().len > 0)
+    result = field.getArr()[i]
+
 proc newField*(apiName: string, sortable, filterable: bool = false,
                fKind: FieldKind = fkStr): FieldObj =
     ## Creates a Field object.

@@ -1,24 +1,15 @@
 import private.nbfield
-import strutils, macros
-
-proc snakeToCamel(snake: string): string =
-    let sep = snake.split("_")
-    result = ""
-    for i in 0..<sep.len:
-        if i == 0:
-            result.add(sep[i])
-        else:
-            result.add(sep[i].capitalizeAscii)
+import macros
 
 macro letField(n: varargs[untyped]): untyped =
     result = newStmtList()
     for item in n:
-        let fName = newIdentNode(snakeToCamel($item[0]))
+        let fName = newIdentNode($item[0])
         var args = newNimNode(nnkArglist)
         for arg in item:
             args.add arg
         result.add quote do:
-            let `fName` = newField(`args`)
+            let `fName`* = newField(`args`)
 
 # - Field variables.
 #
@@ -47,7 +38,7 @@ letField(
     ("developer_releases"),
     ("distributor_releases"),
     ("dlc_name"),
-    ("enemies"),
+    ("enemies", "character"),
     ("expected_release_day"),
     ("expected_release_month", filterable = true),
     ("expected_release_quarter", filterable = true),
@@ -62,7 +53,7 @@ letField(
     ("first_appearance_people", "person"),
     ("first_credited_game", fKind = fkRes),
     ("franchises", "franchise"),
-    ("friends", fkind = fkRes),
+    ("friends", "character"),
     ("game", filterable = true, fKind = fkRes),
     ("game_rating", fKind = fkRes),
     ("games", "game"),
@@ -138,5 +129,3 @@ letField(
     ("tiny_url")
 )
 # Yowza..
-
-echo region.kind 

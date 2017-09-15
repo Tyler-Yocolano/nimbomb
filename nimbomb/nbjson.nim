@@ -40,17 +40,17 @@ proc jsonToRes*(element: JsonNode, resType: string): Resource =
                 #echo("Got a string node.")
                 let cont = val.getStr()
                 result.getField(key).setContent(cont)
-                #echo(key & " set to: " & $result.fieldList.getField(key))
+                #echo(key & " set to: " & result.getField(key).getStr())
             of JInt:
                 #echo("Got an int node.")
                 let cont = val.getNum().int
                 result.getField(key).setContent(cont)
-                #echo(key & " set to: " & $result.fieldList.getField(key))
+                #echo(key & " set to: " & $result.getField(key).getInt)
             of JObject:
                 #echo("Got an object node.")
                 let cont = jsonToRes(val, key)
                 result.getField(key).setContent(cont)
-                #echo(key & " set to: " & $result.fieldList.getField(key))
+                #echo(key & " set to: " & $result.getField(key).getRes())
             of JArray:
                 #echo("Got an array node.")
                 var list: seq[Resource] = @[]

@@ -10,6 +10,6 @@ when isMainModule:
         assert(results[0].getField(name).getStr() == "Zelda", "Error: something is wrong with the Json2Resource parser.")
     block gBConnectTest:
         var nimbomber = newNimbombClient()
-        let results = nimbomber.search("halo")
+        let results = nimbomber.search("zelda")
         discard nimbomber.get(results[0])
         assert(nimbomber.lastResponse.error == "OK", "Error: " & nimbomber.lastResponse.error)
