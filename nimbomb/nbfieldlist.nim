@@ -1,119 +1,142 @@
 import private.nbfield
+import strutils, macros
+
+proc snakeToCamel(snake: string): string =
+    let sep = snake.split("_")
+    result = ""
+    for i in 0..<sep.len:
+        if i == 0:
+            result.add(sep[i])
+        else:
+            result.add(sep[i].capitalizeAscii)
+
+macro letField(n: varargs[untyped]): untyped =
+    result = newStmtList()
+    for item in n:
+        let fName = newIdentNode(snakeToCamel($item[0]))
+        var args = newNimNode(nnkArglist)
+        for arg in item:
+            args.add arg
+        result.add quote do:
+            let `fName` = newField(`args`)
 
 # - Field variables.
 #
 # Initiated here to help create and search for resources
-let
-    abbreviation*   = newField("abbreviation")
-    aliases*        = newField("aliases", filterable = true)
-    apiDetailUrl*   = newField("api_detail_url")
-    birthday*       = newField("birthday", true, true)
-    birthdate*      = newField("birth_date", true, true)
-    characters*     = newField("characters", "character")
-    channelName*    = newField("channel_name")
-    concepts*       = newField("concepts", "concept")
-    company*        = newField("company", fKind = fkRes)
-    companies*      = newField("companies", "company")
-    country*        = newField("country", true, true)
-    added*          = newField("date_added", true, true)
-    founded*        = newField("date_founded", true, true)
-    lastUpdated*    = newField("date_last_updated", true, true)
-    deathDate*      = newField("death_date", true, true)
-    summary*        = newField("deck")
-    desc*           = newField("description")
-    detailResName*  = newField("detail_resource_name")
-    devs*           = newField("developers", "company")
-    devGames*       = newField("developed_games")
-    devReleases*    = newField("developer_releases")
-    distReleases*   = newField("distributor_releases")
-    dlcName*        = newField("dlc_name")
-    enemies*        = newField("enemies")
-    expReleaseDay*  = newField("expected_release_day")
-    expReleaseMon*  = newField("expected_release_month", filterable = true)
-    expReleaseQrtr* = newField("expected_release_quarter", filterable = true)
-    expReleaseYear* = newField("expected_release_year", filterable = true)
-    error*          = newField("error")
-    firstFranchise* = newField("first_appeared_in_franchise")
-    firstChars*     = newField("first_appearance_characters", "character")
-    firstConcepts*  = newField("first_appearance_concepts", "concept")
-    firstInGame*    = newField("first_appeared_in_game", fKind = fkRes)
-    firstLocs*      = newField("first_appearance_locations", "location")
-    firstObjects*   = newField("first_appearance_objects", "object")
-    firstPeople*    = newField("first_appearance_people", "person")
-    firstCreditIn*  = newField("first_credited_game", fKind = fkRes)
-    franchises*     = newField("franchises", "franchise")
-    friends*        = newField("friends", fkind = fkRes)
-    game*           = newField("game", filterable = true, fKind = fkRes)
-    gameRating*     = newField("game_rating", fKind = fkRes)
-    games*          = newField("games", "game")
-    genres*         = newField("genres", "genre")
-    gender*         = newField("gender", true, true, fkind = fkInt)
-    hometown*       = newField("hometown", true, true)
-    id*             = newField("id", true, true, fkInt)
-    image*          = newField("image", fKind = fkRes)
-    images*         = newField("images", "image")
-    installBase*    = newField("install_base", true, true)
-    killedChars*    = newField("killed_characters", "character")
-    lastName*       = newField("last_name")
-    link*           = newField("link")
-    listResName*    = newField("list_resource_name")
-    locAddress*     = newField("location_address")
-    locCity*        = newField("location_city")
-    locCountry*     = newField("location_country")
-    locState*       = newField("location_state")
-    locations*      = newField("locations", "location")
-    maxPlayers*     = newField("maximum_players", fkind = fkInt)
-    minPlayers*     = newField("minimum_players", fkind = fkInt)
-    multiFeatures*  = newField("multiplayer_features")
-    name*           = newField("name", true, true)
-    amtUserReviews* = newField("number_of_user_reviews", fkind = fkInt)
-    objects*        = newField("objects", "object")
-    origGameRating* = newField("original_game_rating", "game_rating")
-    origRlsDate*    = newField("original_release_date")
-    onlineSupport*  = newField("online_support", true, true)
-    origPrice*      = newField("original_price", true, true)
-    password*       = newField("password")
-    people*         = newField("people", "person")
-    phone*          = newField("phone")
-    platform*       = newField("platform", true, true, fkRes)
-    platforms*      = newField("platforms", "platform")
-    prodCodeType*   = newField("product_code_type")
-    prodCodeVal*    = newField("product_code_value")
-    pubGames*       = newField("published_games")
-    pubReleases*    = newField("published_releases")
-    publishers*     = newField("publishers", "publisher")
-    publishDate*    = newFIeld("publish_date")
-    ratingBoard*    = newField("rating_board", true, true, fkRes)
-    realName*       = newField("real_name")
-    region*         = newField("region", fKind = fkRes)
-    relatedCons*    = newField("related_concepts")
-    releaseDate*    = newField("release_date", sortable = true)
-    release*        = newField("release", fkind = fkRes)
-    releases*       = newField("releases", "release")
-    resolutions*    = newField("resolutions")
-    resourceType*   = newField("resource_type")
-    reviewer*       = newField("reviewer")
-    dlcs*           = newField("dlcs", "dlc")
-    reviews*        = newField("reviews", "review")
-    score*          = newField("score")
-    similarGames*   = newField("similar_games", "game")
-    siteDetailUrl*  = newField("site_detail_url")
-    soundSystems*   = newField("sound_system")
-    spFeatures*     = newField("singleplayer_features")
-    title*          = newField("title")
-    themes*         = newField("themes", "theme")
-    website*        = newField("website")
-    user*           = newField("user")
-    videos*         = newField("videos", "video")
-    widescreen*     = newField("widescreen_support")
+letField(
+    ("abbreviation"),
+    ("aliases", true),
+    ("api_detail_url"),
+    ("birthday", true, true),
+    ("birth_date", true, true),
+    ("characters", "character"),
+    ("channel_name"),
+    ("concepts", "concept"),
+    ("company", fKind = fkRes),
+    ("companies", "company"),
+    ("country", true, true),
+    ("date_added", true, true),
+    ("date_founded", true, true),
+    ("date_last_updated", true, true),
+    ("death_date", true, true),
+    ("deck"),
+    ("description"),
+    ("detail_resource_name"),
+    ("developers", "company"),
+    ("developed_games"),
+    ("developer_releases"),
+    ("distributor_releases"),
+    ("dlc_name"),
+    ("enemies"),
+    ("expected_release_day"),
+    ("expected_release_month", filterable = true),
+    ("expected_release_quarter", filterable = true),
+    ("expected_release_year", filterable = true),
+    ("error"),
+    ("first_appeared_in_franchise"),
+    ("first_appearance_characters", "character"),
+    ("first_appearance_concepts", "concept"),
+    ("first_appeared_in_game", fKind = fkRes),
+    ("first_appearance_locations", "location"),
+    ("first_appearance_objects", "object"),
+    ("first_appearance_people", "person"),
+    ("first_credited_game", fKind = fkRes),
+    ("franchises", "franchise"),
+    ("friends", fkind = fkRes),
+    ("game", filterable = true, fKind = fkRes),
+    ("game_rating", fKind = fkRes),
+    ("games", "game"),
+    ("genres", "genre"),
+    ("gender", true, true, fkind = fkInt),
+    ("hometown", true, true),
+    ("id", true, true, fkInt),
+    ("image", fKind = fkRes),
+    ("images", "image"),
+    ("install_base", true, true),
+    ("killed_characters", "character"),
+    ("last_name"),
+    ("link"),
+    ("list_resource_name"),
+    ("location_address"),
+    ("location_city"),
+    ("location_country"),
+    ("location_state"),
+    ("locations", "location"),
+    ("maximum_players", fkind = fkInt),
+    ("minimum_players", fkind = fkInt),
+    ("multiplayer_features"),
+    ("name", true, true),
+    ("number_of_user_reviews", fkind = fkInt),
+    ("objects", "object"),
+    ("original_game_rating", "game_rating"),
+    ("original_release_date"),
+    ("online_support", true, true),
+    ("original_price", true, true),
+    ("password"),
+    ("people", "person"),
+    ("phone"),
+    ("platform", true, true, fkRes),
+    ("platforms", "platform"),
+    ("product_code_type"),
+    ("product_code_value"),
+    ("published_games"),
+    ("published_releases"),
+    ("publishers", "publisher"),
+    ("publish_date"),
+    ("rating_board", true, true, fkRes),
+    ("real_name"),
+    ("region", fKind = fkRes),
+    ("related_concepts"),
+    ("release_date", sortable = true),
+    ("release", fkind = fkRes),
+    ("releases", "release"),
+    ("resolutions"),
+    ("resource_type"),
+    ("reviewer"),
+    ("dlcs", "dlc"),
+    ("reviews", "review"),
+    ("score"),
+    ("similar_games", "game"),
+    ("site_detail_url"),
+    ("sound_system"),
+    ("singleplayer_features"),
+    ("title"),
+    ("themes", "theme"),
+    ("website"),
+    ("user"),
+    ("videos", "video"),
+    ("widescreen_support"),
 
     # Image only fields
-    iconUrl*        = newField("icon_url")
-    mediumUrl*      = newField("medium_url")
-    screenUrl*      = newField("screen_url")
-    screenLargeUrl* = newField("screen_large_url")
-    smallUrl*       = newField("small_url")
-    superUrl*       = newField("super_url")
-    thumbUrl*       = newField("thumb_url")
-    tinyUrl*        = newField("tiny_url")
+    ("icon_url"),
+    ("medium_url"),
+    ("screen_url"),
+    ("screen_large_url"),
+    ("small_url"),
+    ("super_url"),
+    ("thumb_url"),
+    ("tiny_url")
+)
 # Yowza..
+
+echo region.kind 
