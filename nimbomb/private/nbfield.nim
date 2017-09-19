@@ -38,7 +38,7 @@ proc getArr*(field: Field): seq[Resource] =
     else:
         result = @[]
 
-proc `[]`*(field: Field, i: int): Resource {. inline .}=
+proc `[]`*(field: Field, i: int): Resource =
     assert(field.kind == fkArr and field.getArr().len > 0)
     result = field.getArr()[i]
 

@@ -4,6 +4,7 @@ import private/[nbresource, nbfield]
 
 type
     JsonResponse* = object
+        ## Object to contain responses from GB API.
         ## The response from GB will always be given with these fields.
         error*: string              ## This should read "OK".
         limit*: int                 ## The amount of results to show.
@@ -18,6 +19,8 @@ type
 
 proc parseResponse*(data: string, search: bool = false): JsonResponse =
     ## Parse the json response.  Set search to true if making a search.
+    ## If search: results in filled with JsonNodes.
+    ## else: result contains the sole JsonNode.
     let dataJson = parseJson(data)
     result.error = dataJson["error"].getStr()
     result.limit = dataJson["limit"].getNum().int

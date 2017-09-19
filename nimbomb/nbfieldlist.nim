@@ -1,7 +1,11 @@
+# List of fields present in GiantBomb Resources.
+# In a seperate file for better readability.
+
 import private.nbfield
 import macros
 
 macro letField(n: varargs[untyped]): untyped =
+    ## Constructs a list of constant fieldObjs.
     result = newStmtList()
     for item in n:
         let fName = newIdentNode($item[0])

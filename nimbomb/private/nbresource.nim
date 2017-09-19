@@ -3,9 +3,9 @@
 import sequtils, strutils
 import nbtypes
 import nbfield
-import "../nbfieldlist"
+import "../nbfieldlist", "../nbresourcelist"
 
-export Resource, FieldList
+export Resource, FieldList, ResourceType
 
 # - Type procedures
 proc newResource*(resType: string): Resource =
@@ -233,6 +233,8 @@ proc newResource*(resType: string): Resource =
                                             score, siteDetailUrl)
         # TODO: Finish this.
 
+proc newResource*(resType: ResourceType): Resource =
+    result = newResource($resType)
 
 proc getField*(resource: Resource, name: string): Field =
     ## Tries to get a field based on the name passed.
